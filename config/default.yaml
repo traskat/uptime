@@ -1,10 +1,10 @@
 url: 'http://localhost:8082'
 
 mongodb:
-  server:   localhost
+  server: localhost
   database: uptime
-  user:     root 
-  password:
+  user: "" 
+  password: ""
   connectionString:       # alternative to setting server, database, user and password separately
 
 monitor:
@@ -14,6 +14,12 @@ monitor:
   timeout:                5000       # five seconds
   userAgent:              NodeUptime/3.0 (https://github.com/fzaninotto/uptime)
 
+ssl:
+  enabled:                false
+  certificate:            uptime.crt # certificate file
+  key:                    uptime.key # key file
+  selfSigned:             false
+
 analyzer:
   updateInterval:         60000      # one minute
   qosAggregationInterval: 600000     # ten minutes
@@ -21,20 +27,27 @@ analyzer:
 
 autoStartMonitor: true
 
+statushub:
+  endpoint: https://statushub.io/api/status_pages #the same for all
+  subdomains: '' # for example ["my_stuff"] as you can have a number of different status pages
+  apiKey: ''
+
 plugins:
   - ./plugins/console
   - ./plugins/patternMatcher
   - ./plugins/httpOptions
+  #- ./plugins/httpsOAuthOptions
   # - ./plugins/email
   # - ./plugins/basicAuth
+  #- ./plugins/statushub
 
 email:
   method:      SMTP  # possible methods are SMTP, SES, or Sendmail
   transport:         # see https://github.com/andris9/nodemailer for transport options
     service:   Gmail # see https://github.com/andris9/Nodemailer/blob/master/lib/wellknown.js for well-known services
     auth:            
-      user:          # The email account username, e.g. 'username@gmail.com'
-      pass:          # The email account password, e.G. 'password'
+      user: "stephan.company@gmail.com"         # The email account username, e.g. 'username@gmail.com'
+      pass: "test123test"         # The email account password, e.G. 'password'
   event:
     up:        true
     down:      true
@@ -42,7 +55,7 @@ email:
     restarted: false
   message:           
     from:            # The message sender, e.g. 'Fred Foo <foo@blurdybloop.com>'
-    to:              # The message recipient, e.g. 'bar@blurdybloop.com, baz@blurdybloop.com'
+    to: "stephan.mic@gmail.com"             # The message recipient, e.g. 'bar@blurdybloop.com, baz@blurdybloop.com'
   # The email plugin also uses the main `url` param for hyperlinks in the sent emails
 
 basicAuth:
