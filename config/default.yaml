@@ -36,10 +36,10 @@ plugins:
   - ./plugins/console
   - ./plugins/patternMatcher
   - ./plugins/httpOptions
-  - ./plugins/httpsOAuthOptions
-  #
-  - ./plugins/email
+  #- ./plugins/httpsOAuthOptions
+  # - ./plugins/email
   # - ./plugins/basicAuth
+  #- ./plugins/statushub
 
 email:
   method:      SMTP  # possible methods are SMTP, SES, or Sendmail
