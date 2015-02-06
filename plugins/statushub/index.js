@@ -39,39 +39,39 @@ exports.initWebApp = function(options) {
       "availability" : {
         "path" : "/" + config.subdomains[0] + "/services/:serviceId/service_statuses?api_key="+config.apiKey,
         "method" : "POST",
-        "headers" : {"Content-Type" : "application/json"},
+        "headers" : {"Content-Type" : "application/json"}
       }
     }
   });
-
-  CheckEvent.on('afterInsert', function (checkEvent) {
-    checkEvent.findCheck(function (err, check) {
-      incidentDescriptionHandler = {
-        down: function(check, checkEvent) {
-          return {
-            service_status: {status_name: "down"}
-          }
-        },
-        up: function(check, checkEvent) {
-          return {
-            service_status: {status_name: "up"}
-          }
-        },
-      }
-      if(incidentDescriptionHandler[checkEvent.message]){
-        status.availability({
-            serviceId: check.statusHubId
-          }, JSON.stringify(incidentDescriptionHandler[checkEvent.message](check, checkEvent))
-          , function(err, result) {
-            if(result.status == "200") {
-              console.log('StatusHub: service status changed');
-            } else {
-              console.error('StatusHub: error changing service status. \nResponse: ' + JSON.stringify(result));
+  if (config.apiKey) {
+    CheckEvent.on('afterInsert', function (checkEvent) {
+      checkEvent.findCheck(function (err, check) {
+        incidentDescriptionHandler = {
+          down: function (check, checkEvent) {
+            return {
+              service_status: {status_name: "down"}
             }
-          });
-      }
+          },
+          up: function (check, checkEvent) {
+            return {
+              service_status: {status_name: "up"}
+            }
+          },
+        }
+        if (incidentDescriptionHandler[checkEvent.message]) {
+          status.availability({
+              serviceId: check.statusHubId
+            }, JSON.stringify(incidentDescriptionHandler[checkEvent.message](check, checkEvent))
+            , function (err, result) {
+              if (result.status == "200") {
+                console.log('StatusHub: service status changed');
+              } else {
+                console.error('StatusHub: error changing service status. \nResponse: ' + JSON.stringify(result));
+              }
+            });
+        }
+      });
     });
-  });
-
+  }
   console.log('Enabled StatusHub notifications');
 };
