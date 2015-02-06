@@ -27,11 +27,17 @@ analyzer:
 
 autoStartMonitor: true
 
+statushub:
+  endpoint: https://statushub.io/api/status_pages #the same for all
+  subdomains: REPLACE_WITH_STATUSHUB_SUBDOMAINS # for example ["my_stuff"] as you can have a number of different status pages
+  apiKey: REPLACE_WITH_STATUSHUB_APIKEY
+
 plugins:
   - ./plugins/console
   - ./plugins/patternMatcher
   - ./plugins/httpOptions
   - ./plugins/httpsOAuthOptions
+  #
   - ./plugins/email
   # - ./plugins/basicAuth
 
