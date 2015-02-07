@@ -32,6 +32,10 @@ statushub:
   subdomains: '' # for example ["my_stuff"] as you can have a number of different status pages
   apiKey: ''
 
+pushbullet:
+  apikey: ""
+
+
 plugins:
   - ./plugins/console
   - ./plugins/patternMatcher

@@ -19,7 +19,8 @@
     "nodemailer": "0.3.35",
     "semver": "1.1.0",
     "socket.io": "0.9.14",
-    "webpagetest": "0.2.0"
+    "webpagetest": "0.2.0",
+    "pushbullet": "1.4.3"
   },
   "devDependencies": {
     "mocha": "1.7.x",
