@@ -50,8 +50,8 @@ email:
   transport:         # see https://github.com/andris9/nodemailer for transport options
     service:   Gmail # see https://github.com/andris9/Nodemailer/blob/master/lib/wellknown.js for well-known services
     auth:            
-      user: "stephan.company@gmail.com"         # The email account username, e.g. 'username@gmail.com'
-      pass: "test123test"         # The email account password, e.G. 'password'
+      user: ""         # The email account username, e.g. 'username@gmail.com'
+      pass: ""         # The email account password, e.G. 'password'
   event:
     up:        true
     down:      true
