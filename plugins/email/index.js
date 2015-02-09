@@ -62,25 +62,30 @@ exports.initWebApp = function(options) {
   CheckEvent.on('afterInsert', function(checkEvent) {
     if (!config.event[checkEvent.message]) return;
     checkEvent.findCheck(function(err, check) {
-      if (err) return console.error(err);
-      var filename = templateDir + checkEvent.message + '.ejs';
-      var renderOptions = {
-        check: check,
-        checkEvent: checkEvent,
-        url: options.config.url,
-        moment: moment,
-        filename: filename
-      };
-      var lines = ejs.render(fs.readFileSync(filename, 'utf8'), renderOptions).split('\n');
-      var mailOptions = {
-        from:    config.message.from,
-        to:      config.message.to,
-        subject: lines.shift(),
-        text:    lines.join('\n')
-      };
-      mailer.sendMail(mailOptions, function(err2, response) {
-        if (err2) return console.error('Email plugin error: %s', err2);
-        console.log('Notified event by email: Check ' + check.name + ' ' + checkEvent.message);
+      Account.findOne({_id: check.owner}, function (e, r) {
+        if(r.notificationSettings.email === ""){
+          return
+        }
+        if (err) return console.error(err);
+        var filename = templateDir + checkEvent.message + '.ejs';
+        var renderOptions = {
+          check: check,
+          checkEvent: checkEvent,
+          url: options.config.url,
+          moment: moment,
+          filename: filename
+        };
+        var lines = ejs.render(fs.readFileSync(filename, 'utf8'), renderOptions).split('\n');
+        var mailOptions = {
+          from: config.message.from,
+          to: r.notificationSettings.email,
+          subject: lines.shift(),
+          text: lines.join('\n')
+        };
+        mailer.sendMail(mailOptions, function (err2, response) {
+          if (err2) return console.error('Email plugin error: %s', err2);
+          console.log('Notified event by email: Check ' + check.name + ' ' + checkEvent.message);
+        });
       });
     });
   });
