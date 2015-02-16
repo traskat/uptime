@@ -29,24 +29,35 @@
  *       paused:    false
  *       restarted: false
  */
-var config     = require('config').pushbullet;
+var config = require('config').pushbullet;
 var CheckEvent = require('../../models/checkEvent');
+var Account = require('../../models/user/accountManager');
 var PushBullet = require('pushbullet');
 var moment = require('moment');
-var pusher = new PushBullet(config.apikey);
-exports.initWebApp = function() {
 
-  CheckEvent.on('afterInsert', function(checkEvent) {
-   /* if (!config.event[checkEvent.message])
-      return;*/
+exports.initWebApp = function () {
 
-    checkEvent.findCheck(function(err, check) {
+  CheckEvent.on('afterInsert', function (checkEvent) {
+    /* if (!config.event[checkEvent.message])
+     return;*/
+
+    checkEvent.findCheck(function (err, check) {
       if (err) {
         return console.error(err);
       }
+      if(!check.notifiers){
+        return;
+      }
+      if (!check.notifiers.pushbullet) {
+        return
+      }
+      if(!check.notifiers.pushbullet.apikey){
+        return;
+      }
+      var pusher = new PushBullet(check.notifiers.pushbullet.apikey);
       var message;
-      if(checkEvent.message === 'up'){
-        message =  check.name + ' went back up after '+ moment.duration(checkEvent.downtime).humanize() +' of downtime';
+      if (checkEvent.message === 'up') {
+        message = check.name + ' went back up after ' + moment.duration(checkEvent.downtime).humanize() + ' of downtime';
       } else {
         message = "The application " + check.name + " just went to status " + checkEvent.message
       }
@@ -57,20 +68,20 @@ exports.initWebApp = function() {
         priority: 1 // optional
       };
       var deviceParams = {};
-      pusher.note(deviceParams, msg.title, msg.message, function(error, response) {
+      pusher.note(deviceParams, msg.title, msg.message, function (error, response) {
         // response is the JSON response from the API
       });
       /*var push     = new pushover({
-        token: config.token
-      });
-      push.user    = config.user;
+       token: config.token
+       });
+       push.user    = config.user;
 
-      push.send( msg, function( err, result ) {
-        if ( err ) {
-          throw err;
-        }
-        console.log( result );
-      });*/
+       push.send( msg, function( err, result ) {
+       if ( err ) {
+       throw err;
+       }
+       console.log( result );
+       });*/
 
 
     });
