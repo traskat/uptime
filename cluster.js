@@ -7,7 +7,7 @@ var workers = [];
 if (cluster.isMaster) {
   var a = analyzer.createAnalyzer(config.analyzer);
   a.start();
-  
+
   var broadcast = function(event) {
     for (var i in workers) {
       var worker = workers[i];
