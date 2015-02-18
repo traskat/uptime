@@ -5,8 +5,8 @@ var apiApp = require('./app/api/app');
 var analyzer = require('./lib/analyzer');
 var workers = [];
 if (cluster.isMaster) {
-  var a = analyzer.createAnalyzer(config.analyzer);
-  a.start();
+  /*var a = analyzer.createAnalyzer(config.analyzer);
+  a.start();*/
 
   var broadcast = function(event) {
     for (var i in workers) {
