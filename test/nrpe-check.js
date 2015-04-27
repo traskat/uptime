@@ -5,7 +5,8 @@ var ref = require('ref');
 //var _ = require('struct-fu');
 var _ = require('c-struct');
 var checksum = require('crc32');
-//var crc = require('crc');
+var sum = require('crc');
+var tls = require('tls');
 
 
 var packet = new _.Schema({
@@ -13,31 +14,33 @@ var packet = new _.Schema({
 	version: _.type.string(),
 	//type: _.type.uint16,
 	type: _.type.string(),
-	crc: _.type.string(),
-	result: _.type.string(),
+	crc: _.type.uint32,
+	result: _.type.uint16,
 	data: _.type.string()
 });
 
 
 console.log(packet);
 
-var myStr = 'vcheck_users';
+var myStr = 'check_load';
 while (myStr.length<1024) {
 	myStr+= '\0';
 };
 
 myStr += '\x6e\x62';
 
-console.log('++++++##################', myStr.length);
+//console.log('++++++##################', myStr.length);
 
 
 
 
 var unpacked = {
 	version: '\x00\x02',
+	//version: 2,
 	type: '\x00\x01',
-	crc: '\x00\x00\x00\x00',
-	result: '\x914',
+	//type: 1,
+	crc: '\x00\x00',
+	result: 3662,
 	data: myStr
 };
 
@@ -46,8 +49,7 @@ _.register('packet', packet);
 
 
 var packed = _.packSync('packet', unpacked,'b');
-
-
+ 
 /*
 unpacked.crc = checksum(packed, true);
 _.register('rawPacket', unpacked);
@@ -55,13 +57,14 @@ var buf =  _.packSync('rawPacket', unpacked);
 */
 //var p = _.packSync(buf);
 //console.log('++',checksum(packed,true), crc.crc32(packed))
-var crc = new Buffer(checksum(packed),'hex').readUInt16BE(0);
-console.log('##',crc);
+var crc = new Buffer(checksum(packed),'hex').readUInt32BE(0);
+//var t = new Buffer(sum.crc32(packed),'hex').readUInt32BE(0);
+console.log('##',checksum(packed, true), checksum(packed), checksum.direct(packed).toString(16));
 
 
 //console.log(packed.toString('hex'));//, unpacked, packed);
 
-packed.writeUInt16BE(crc, 4);
+packed.writeUInt32BE(crc, 4);
 //console.log(packed.toString('hex'));//, unpacked, packed);
 
 var buf = packed;
@@ -103,31 +106,52 @@ var opts = {
 	writeable: true
 }
 
-var s = new net.Socket (opts);
+var tlsOpts = {
+	secureProtocol: 'SSLv2_method',
+	rejectUnauthorized: false
+}
 
-var con = s.connect('5666', '188.40.61.216');
+
+var tlsCon = tls.connect('5666',tlsOpts, '188.40.95.17', function() {
+	console.log('TLS CLIENT connected');
+
+	tlsCon.write(buf);
+});
+
+tlsCon.on('data', function(data) {
+	console.log('TLS DATA: ', data);
+});
+
+tlsCon.on('secureConnect', function() {
+	console.log('secure conncet');
+})
+
+tlsCon.on('error', function(err) {
+	console.log('TLS ERROR', err);
+})
 
 var b = '00020001ce0fe8fe4e76636865636b5f757365727300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006e62';
 buff = new Buffer(b,'hex');
 
+//var s = new net.Socket (opts);
+
+//var con = s.connect('5666', '188.40.61.216');
+
+/*
 con.on('connect', function() {
 	console.log('Connected...');
-	console.log('################',buff.toString('hex'), buff.length);
-	console.log('################',buf.toString('hex'), buf.length);
+	//console.log('################',buff.toString('hex'), buff.length);
+	//console.log('################',buf.toString('hex'), buf.length);
 
 	con.write(buf);
 	// var res = con.write(buf, function(val) {
 	// 	console.log('VAL: ', val)
 	// });
-
-	con.on('data', function(data) {
-		console.log('++++++++++++', data)
-	})
 	//console.log('RES: ', res);
 })
 
 con.on('data', function(data) {
-	console.log('--------------data: ', data);
+	console.log('--------------data: ', data.toString());
 });
 
 con.on('drain', function() {
@@ -136,4 +160,4 @@ con.on('drain', function() {
 
 con.on('error', function(err) {
 	console.log('error', err);
-});
+});*/
