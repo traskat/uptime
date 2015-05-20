@@ -9,7 +9,7 @@ mongodb:
 
 monitor:
   name:                   origin
-  apiUrl:                 'http://monitor.h34p-0v3rfl0w.com:8082/api' # must be accessible without a proxy
+  apiUrl:                 'http://locahost:8082/api' # must be accessible without a proxy
   pollingInterval:        10000      # ten seconds
   timeout:                5000       # five seconds
   userAgent:              NodeUptime/3.0 (https://github.com/fzaninotto/uptime)
@@ -42,7 +42,7 @@ plugins:
   - ./plugins/httpOptions
   #- ./plugins/httpsOAuthOptions
   # - ./plugins/email
-  - ./plugins/basicAuth
+  # - ./plugins/basicAuth
   #- ./plugins/statushub
 
 email:
@@ -63,8 +63,8 @@ email:
   # The email plugin also uses the main `url` param for hyperlinks in the sent emails
 
 basicAuth:
-  username:    auther
-  password:    m45t3r4cc0unt
+  username:    admin
+  password:    password
 verbose: true # only used in dev
 
 webPageTest:
